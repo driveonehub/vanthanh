@@ -92,7 +92,7 @@ const KEY_TTRUONG = [
 ];
 
 const LINK_TTRUONG = [
- "DLink","ĐCTC","DCTC","DC TC","PortalLink","Website tra cứu HĐ","Đường dẫn tra cứu"
+ "DLink","ĐCTC","DCTC","DC TC","PortalLink","Website tra cứu HĐ","Đường dẫn tra cứu","Link tra cứu"
 ];
 
 /* ===== TT32 SUPPORT ===== */
@@ -722,6 +722,12 @@ else if(MSTTCGP==="0312270160") { // NC9
   add(`- `);add(`https://ameinvoice.vn/einvoice/?key_receive=${MaTCHdon}`);add(`<br>`);
   add(`- `);add(`${LinkTCHdon}`);add(`<br>`);
   } 
+
+else if(MSTTCGP==="0313253288") { // Tadu
+  add(`- Mã tra cứu: ${MaTCHdon}`);add(`<br>`);
+  add(`- `);add(`https://tracuu.autoinvoice.vn/taihd.zul?seen=true&id=${MaTCHdon}`);add(`<br>`);
+  add(`- `);add(`${LinkTCHdon}/taihd.zul?seen=true&id=${MaTCHdon}`);add(`<br>`);
+  }
 
  let html=`<div class="block"><b>File:</b> ${name}<br><br>
 Mẫu số - ký kiệu: ${KHMSHDon} - ${KHHDon}<br>
