@@ -466,14 +466,6 @@ function filter(){
     clearTimeout(filterTimer);
     filterTimer = setTimeout(function(){
     const k = search.value.trim().toLowerCase();
-        // ===== CẬP NHẬT URL =====
-    const url = new URL(location);
-    if(k){
-        url.searchParams.set('filter', k);
-        }else{
-        url.searchParams.delete('filter');
-        }
-        history.replaceState(null,'',url);
     if(!k){
         render(origin);
         return;
