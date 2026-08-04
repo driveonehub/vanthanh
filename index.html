@@ -307,8 +307,7 @@ function load(){
           Nhaplieu:r[col.Nhaplieu]
         };
 	obj._search = Object.values(obj)
-   	 .join(' ')
-	    .toLowerCase();
+   	 .map(v => v ?? '').join(' ').toLowerCase();
 	origin.push(obj);
       }else{
         const obj = {
@@ -326,12 +325,14 @@ function load(){
           Nhaplieu:r[col.Nhaplieu]
         };
 	obj._search = Object.values(obj)
-   	 .join(' ')
-	    .toLowerCase();
+   	 .map(v => v ?? '').join(' ').toLowerCase();
 	origin.push(obj);
       }
     }
     render(origin);
+  if(search.value){
+    filter();
+    }
   });
 }
 
@@ -465,6 +466,14 @@ function filter(){
     clearTimeout(filterTimer);
     filterTimer = setTimeout(function(){
     const k = search.value.trim().toLowerCase();
+        // ===== CẬP NHẬT URL =====
+    const url = new URL(location);
+    if(k){
+        url.searchParams.set('filter', k);
+        }else{
+        url.searchParams.delete('filter');
+        }
+        history.replaceState(null,'',url);
     if(!k){
         render(origin);
         return;
@@ -481,6 +490,7 @@ function filter(){
 
   const nameParam = params.get('name');
   const yearParam = params.get('year');
+  const filterParam = params.get('filter');
 
   if(nameParam && CSV_MAP[nameParam]){
     source.value = nameParam;
@@ -490,6 +500,9 @@ function filter(){
     const opt = [...year.options].find(o => o.value === yearParam);
     if(opt) year.value = yearParam;
   }
+  if(filterParam){
+    search.value = filterParam;
+}
 })();
 
 /* =======================
