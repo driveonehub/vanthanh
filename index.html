@@ -259,6 +259,7 @@ const year=document.getElementById('year');
 const title=document.getElementById('title');
 const tb=document.getElementById('tb');
 const search=document.getElementById('search');
+let filterTimer = null;
 const thead=document.getElementById('thead');
 
 function load(){
@@ -291,7 +292,7 @@ function load(){
       if(y !== 'all' && getYear(d) !== y) continue;
 
       if(cfg.group==='DV'){
-        origin.push({
+        const obj = {
           Dgroup: 'DV',
           Noido:r[col.Noido],
           Nlap:d,
@@ -304,9 +305,13 @@ function load(){
           Fkey:r[col.Fkey],
           Linkview:r[col.Linkview],
           Nhaplieu:r[col.Nhaplieu]
-        });
+        };
+	obj._search = Object.values(obj)
+   	 .join(' ')
+	    .toLowerCase();
+	origin.push(obj);
       }else{
-        origin.push({
+        const obj = {
           Dgroup: 'DR',
           Noido:r[col.Noido],
           Nlap:d,
@@ -319,7 +324,11 @@ function load(){
           Fkey:r[col.Fkey],
           Linkview:r[col.Linkview],
           Nhaplieu:r[col.Nhaplieu]
-        });
+        };
+	obj._search = Object.values(obj)
+   	 .join(' ')
+	    .toLowerCase();
+	origin.push(obj);
       }
     }
     render(origin);
@@ -453,8 +462,15 @@ function SumTongtien(fromHeader = false){
    FILTER
 ======================= */
 function filter(){
-  const k=search.value.toLowerCase();
-  render(origin.filter(r=>Object.values(r).some(v=>v&&v.toString().toLowerCase().includes(k))));
+    clearTimeout(filterTimer);
+    filterTimer = setTimeout(function(){
+    const k = search.value.trim().toLowerCase();
+    if(!k){
+        render(origin);
+        return;
+    }
+    render(origin.filter(r => r._search.includes(k)));
+    },180);
 }
 
 /* =======================
