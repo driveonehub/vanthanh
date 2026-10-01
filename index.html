@@ -195,18 +195,79 @@ function getYear(v){
 
 /* 🔧 SỬA DUY NHẤT CHO DR */
 function parseNumber(val){
-  if(!val) return 0;
-  let v=val.toString().trim();
-  if(v.includes('.')&&!v.includes(',')) v=v.replace(/\./g,'');
-  if(v.includes(',')&&v.includes('.')){
-    if(v.lastIndexOf(',')>v.lastIndexOf('.')){
-      v=v.replace(/\./g,'').replace(',','.');
+  if(val === null || val === undefined || val === '') return 0;
+  // Nếu đã là Number thì trả về ngay
+  if(typeof val === 'number'){
+    return Number.isFinite(val) ? val : 0;
+  }
+  let s = String(val).trim();
+  if(!s) return 0;
+  // 1. Xử lý số âm dạng ngoặc (1.234,56) => -1234.56
+  let negative = false;
+  if(/^\(.*\)$/.test(s)){
+    negative = true;
+    s = s.slice(1, -1).trim();
+  }
+  // 2. Xử lý dấu âm
+  if(s.startsWith('-')){
+    negative = true;
+    s = s.slice(1).trim();
+  }
+  // 3. Bỏ ký hiệu tiền tệ / khoảng trắng / ký tự lạ, Giữ lại số, "." và ","
+  s = s
+    .replace(/\s/g, '')
+    .replace(/[₫đĐ]/g, '')
+    .replace(/VND/gi, '')
+    .replace(/[^\d.,]/g, '');
+  if(!s) return 0;
+  // 4. Không có dấu phân cách
+  if(!s.includes('.') && !s.includes(',')){
+    const n = Number(s);
+    return Number.isFinite(n)
+      ? (negative ? -n : n)
+      : 0;
+  }
+  // 5. Có cả "." và "," thì dấu xuất hiện cuối cùng = dấu thập phân: 1.234.567,89 => 1234567.89 / 1,234,567.89 => 1234567.89
+  if(s.includes('.') && s.includes(',')){
+    const lastDot   = s.lastIndexOf('.');
+    const lastComma = s.lastIndexOf(',');
+    let decimalSeparator;
+    let thousandSeparator;
+    if(lastComma > lastDot){
+      decimalSeparator = ',';
+      thousandSeparator = '.';
     }else{
-      v=v.replace(/,/g,'');
+      decimalSeparator = '.';
+      thousandSeparator = ',';
+    }
+    // Bỏ toàn bộ dấu hàng nghìn
+    s = s.split(thousandSeparator).join('');
+    // Đổi dấu thập phân thành "."
+    s = s.replace(decimalSeparator, '.');
+  }else{
+    // 6. Chỉ có một loại dấu
+    const separator = s.includes('.') ? '.' : ',';
+    const parts = s.split(separator);
+    // Có nhiều dấu: 1.234.567 / 1,234,567 => chắc chắn là phân cách hàng nghìn
+    if(parts.length > 2){
+      s = parts.join('');
+    }else{
+      const integerPart = parts[0];
+      const decimalPart = parts[1] || '';
+      // Chỉ có 1 dấu.
+      // Nếu phần sau có đúng 3 chữ số và phần trước không phải 0: 1.234  => 1234 / 12.345 => 12345
+      // Nếu 1-2 chữ số: 1.23 => 1.23 / 12.50 => 12.50
+      // Nếu >3 chữ số: 1.2345 => 1.2345
+      if(decimalPart.length === 3 && integerPart.length >= 1){
+        s = integerPart + decimalPart;
+      }else{
+        s = integerPart + '.' + decimalPart;
+      }
     }
   }
-  const n=Number(v);
-  return isNaN(n)?0:n;
+  const n = Number(s);
+  if(!Number.isFinite(n)) return 0;
+  return negative ? -n : n;
 }
 
 /* =======================
