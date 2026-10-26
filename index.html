@@ -70,6 +70,61 @@ tfoot{display:none;} /* Ẩn khi chưa load dữ liệu, hiện lại trong rend
 .controls{margin-bottom:10px;display:flex;gap:10px;align-items:center}
 a{text-decoration:none}
 
+/* Khung bọc ngoài bảng để bo tròn 4 góc hoàn hảo */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Cho phép cuộn ngang trên điện thoại nếu bảng quá dài */
+    border: 1px solid #999;
+    border-radius: 12px; /* Độ bo tròn 4 góc khung bảng */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-top: 10px;
+}
+
+/* Đảm bảo bảng bên trong lấp đầy và khớp viền */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    border: none; /* Bỏ viền ngoài của table để dùng viền của container */
+}
+
+/* Tinh chỉnh lại border của các ô bên trong bảng cho liền mạch */
+th, td {
+    border: 1px solid #ddd;
+    padding: 6px;
+}
+
+/* Bo góc cho hàng tiêu chuẩn phía trên cùng (Header) khớp với khung */
+thead tr:first-child th:first-child {
+    border-top-left-radius: 11px;
+}
+thead tr:first-child th:last-child {
+    border-top-right-radius: 11px;
+}
+
+/* Bo góc cho hàng cuối cùng (Footer hoặc dòng cuối tbody) khớp với khung */
+tfoot tr:last-child th:first-child,
+tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 11px;
+}
+tfoot tr:last-child th:last-child,
+tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 11px;
+}
+
+/* Giới hạn cột "Web tra cứu, Fkey" (cột số 7) tối đa 18% chiều rộng bảng */
+.col-web {
+    width: 16%;
+    max-width: 18%;
+    word-break: break-word;
+    overflow: hidden;
+}
+.col-fkey {
+    width: 12%;
+    max-width: 15%;
+    word-break: break-word;
+    overflow: hidden;
+}
+
 /* ===== DASHBOARD TABS ===== */
 .tabs{
   display:flex;
@@ -327,6 +382,9 @@ function renderHeader(group){
   const tr=document.createElement('tr');
   TABLE_HEADER[group].forEach(t=>{
     const th=document.createElement('th');
+    // Gắn class dựa theo tên cột
+    if(t === 'Web tra cứu' || t === 'Web') th.className = 'col-web';
+    if(t === 'ID/Fkey') th.className = 'col-fkey';
     if(t === '✔'){
     th.innerHTML = `
     <input type="checkbox" id="checkAll" checked disabled
@@ -487,8 +545,8 @@ function render(data){
   <td class="number" data-money="${r.Tongtien}">${r.Tongtien.toLocaleString('en-US')}</td>
   <td>${r.Trangthai||''}</td>
   <td>${r.Checkinfo||''}</td>
-  <td>${r.LinkTC?`<a href="${r.LinkTC}" target="_blank">${r.WebTC}</a>`:(r.WebTC||'')}</td>
-  <td>${FkeyText||''}</td>
+  <td class="col-web">${r.LinkTC?`<a href="${r.LinkTC}" target="_blank">${r.WebTC}</a>`:(r.WebTC||'')}</td>
+  <td class="col-fkey">${FkeyText||''}</td>
   <td>${SafeLink(r.Linkview, 'xem')}</td>
   <td><input type="checkbox" class="row-check" checked onchange="SumTongtien()"></td>
   `;
@@ -499,8 +557,8 @@ function render(data){
   <td>${r.TenKH||''}</td>
   <td class="number" data-money="${r.Tongtien}">${r.Tongtien.toLocaleString('en-US')}</td>
   <td>${r.Trangthai||''}</td>
-  <td>${r.LinkTC?`<a href="${r.LinkTC}" target="_blank">${r.WebTC}</a>`:(r.WebTC||'')}</td>
-  <td>${FkeyText||''}</td>
+  <td class="col-web">${r.LinkTC?`<a href="${r.LinkTC}" target="_blank">${r.WebTC}</a>`:(r.WebTC||'')}</td>
+  <td class="col-fkey">${FkeyText||''}</td>
   <td>${r.Congtrinh||''}</td>
   <td>${SafeLink(r.Linkview, 'xem')}</td>
   <td><input type="checkbox" class="row-check" checked onchange="SumTongtien()"></td>
